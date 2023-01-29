@@ -16,15 +16,12 @@ import org.springframework.stereotype.Component;
 public class UnautorizedExceptionAspect {
 
     @Around(value="execution(* com.aop.throwingadvice.Config.*(..))")
-    public Object afterThrowingAdvice(ProceedingJoinPoint joinPoint) throws Exception {
+    public Object afterThrowingAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
             return joinPoint.proceed();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             log.info("Exception message : {} ", e.getMessage());
             throw new Exception();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw new RuntimeException();
         }
     }
 

@@ -3,8 +3,10 @@ package com.aop.throwingadvice;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -13,12 +15,17 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UnautorizedExceptionAspect {
 
-
-    @AfterThrowing(value="execution(* com.aop.throwingadvice.Config.*(..)) && @annotation(com.aop.throwingadvice.UnauthorizedException)",throwing="ex")
-    public void afterThrowingAdvice(JoinPoint joinPoint, Exception ex)
-    {
-        System.out.println("After Throwing exception in method:"+joinPoint.getSignature());
-        System.out.println("Exception is:"+ex.getMessage());
+    @Around(value="execution(* com.aop.throwingadvice.Config.*(..))")
+    public Object afterThrowingAdvice(ProceedingJoinPoint joinPoint) throws Exception {
+        try {
+            return joinPoint.proceed();
+        } catch (Exception e) {
+            log.info("Exception message : {} ", e.getMessage());
+            throw new Exception();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
     }
 
 }
